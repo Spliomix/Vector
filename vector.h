@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<initializer_list>
+#include <cstddef>
 using namespace std;
 class Vector
 {
@@ -10,6 +11,28 @@ class Vector
 	double *values;
 	
 public:
+	double* begin() { return values; }
+	double* end() { return values + sz; }
+	const double* begin() const { return values; }
+	const double* end() const { return values + sz; }
+	using value_type = double;
+	using size_type = size_t;
+	using difference_type = ptrdiff_t;
+	using reference = double&;
+	using const_reference = const double&;
+	using pointer = double*;
+	using const_pointer = const double*;
+	using iterator = double*;
+	using const_iterator = const double*;
+	class Iterator { //automatisch friend von Vector
+			double *ptr;
+		public:
+			Iterator(double*);
+			Iterator& operator++;
+			bool operator!=(const Iterator&);
+			double& operator*();
+			const double& operator*() const;
+	};
 	Vector() {
 		values = new double[max_size];
 	}
@@ -63,7 +86,10 @@ public:
 		if (sz <=val || empty()) throw runtime_error("Position nicht vorhanden");
 		return values[val];
 	}
-
+	double& operator[](size_t val)const {
+		if (sz <= val || empty()) throw runtime_error("Position nicht vorhanden");
+		return values[val];
+	}
 	void clear() {
 		this->sz = 0;
 	}
@@ -88,10 +114,11 @@ public:
 			temp[i] = values[i];
 		};
 		delete[] values;
-		values = new double[max_size];
+		values = temp;
+		/*values = new double[max_size];
 		for (size_t i = 0; i < sz - 1 + 1; i++) {
 			values[i] = temp[i];
-		};	
+		};	*/
 		delete[] temp;
 	}
 };
