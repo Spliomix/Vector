@@ -25,24 +25,20 @@ public:
 
 	class Iterator { //automatisch friend von Vector
 			double *ptr;
-			double *sptr;
-			double *eptr;
-			bool first{ false };
+			size_t first{ 1 };
 		public:
 			Iterator(double* init_loc) {
 				ptr=init_loc;
-				sptr = init_loc;
 			}
 			Iterator& operator++() {
-				if (!first && ptr + 1 == eptr) {
-					ptr = sptr-1;
-					first = true;
+				if (first ==3) {
+					++ptr;
+					first = 0;
 				};	
-				++ptr;
+				first++;
 				return *this;
 			}
 			bool operator!=(const Iterator& it2) {
-				eptr = it2.ptr;
 				if ((it2.ptr) == (this->ptr))
 					return false;
 				return true;
