@@ -20,19 +20,29 @@ class Vector
 	double *values;
 	
 public:
-	
+	
+
 
 	class Iterator { //automatisch friend von Vector
 			double *ptr;
+			double *sptr;
+			double *eptr;
+			bool first{ false };
 		public:
 			Iterator(double* init_loc) {
 				ptr=init_loc;
+				sptr = init_loc;
 			}
 			Iterator& operator++() {
-				--ptr;
+				if (!first && ptr + 1 == eptr) {
+					ptr = sptr-1;
+					first = true;
+				};	
+				++ptr;
 				return *this;
 			}
 			bool operator!=(const Iterator& it2) {
+				eptr = it2.ptr;
 				if ((it2.ptr) == (this->ptr))
 					return false;
 				return true;
@@ -44,10 +54,10 @@ public:
 				return *ptr;
 			}
 	};
-	Iterator begin() { return Iterator(values + sz-1); }
-	Iterator end() { return Iterator(values-1 ); }
-	const Iterator begin() const { return Iterator(values + sz-1); }
-	const Iterator end() const { return Iterator(values+1 ); }
+	Iterator begin() { return Iterator(values); }
+	Iterator end() { return Iterator(values+sz ); }
+	const Iterator begin() const { return Iterator(values); }
+	const Iterator end() const { return Iterator(values+sz ); }
 	Vector() {
 		values = new double[max_size];
 	}
