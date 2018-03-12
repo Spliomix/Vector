@@ -29,7 +29,7 @@ public:
 				ptr=init_loc;
 			}
 			Iterator& operator++() {
-				ptr++;
+				--ptr;
 				return *this;
 			}
 			bool operator!=(const Iterator& it2) {
@@ -44,10 +44,10 @@ public:
 				return *ptr;
 			}
 	};
-	Iterator begin() { return Iterator(values); }
-	Iterator end() { return Iterator(values + sz); }
-	const Iterator begin() const { return Iterator(values); }
-	const Iterator end() const { return Iterator(values + sz); }
+	Iterator begin() { return Iterator(values + sz-1); }
+	Iterator end() { return Iterator(values-1 ); }
+	const Iterator begin() const { return Iterator(values + sz-1); }
+	const Iterator end() const { return Iterator(values+1 ); }
 	Vector() {
 		values = new double[max_size];
 	}
