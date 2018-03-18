@@ -48,11 +48,13 @@ public:
 
 				}
 				Iterator& operator++() {
+					if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 						++ptr;
 					return *this;
 				}
 
 				Iterator operator++(int) {
+					if ((v->values + v->size()) == ptr+1) throw runtime_error("end() erreicht");
 					iterator old(*this);
 					 ++*this;
 
@@ -60,6 +62,7 @@ public:
 				}
 
 				pointer operator->(){
+					if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 					return ptr;
 				}
 
@@ -101,19 +104,20 @@ class Const_Iterator { //automatisch friend von Vector
 			using iterator_category= std::forward_iterator_tag;
 	private:
 				pointer ptr;
-				size_type first{ 1 };
-				Vector *v;
+				const Vector *v;
 	public:
 		Const_Iterator(pointer init_loc, const Vector *v) {
-					ptr=init_loc;			
+					ptr=init_loc;
+					this->v = v;
 				}
 		Const_Iterator() {
 				}
-		//Const_Iterator(Iterator &it) {
-			//ptr = it.operator->();
-		//}
+		Const_Iterator(const Const_Iterator &it2) {
+			this->v = it2.v;
+			this->ptr = it2.ptr;
+		}
 		Const_Iterator& operator++() {
-					//if ((v->values + v->size()) >= ptr) throw runtime_error("end() erreicht");
+			if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 						++ptr;		
 					return *this;
 				}
@@ -134,12 +138,14 @@ class Const_Iterator { //automatisch friend von Vector
 
 
 				Const_Iterator operator++(int) {
+					if ((v->values + v->size()) == ptr+1) throw runtime_error("end() erreicht");
 					Const_Iterator old(*this);
-					 ++*this;
+					 ++*this;		
 					return old;					
 				}
 
 				pointer operator->(){
+					if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 					return ptr;
 				}
 
@@ -189,8 +195,8 @@ class Const_Iterator { //automatisch friend von Vector
 
 
 	Iterator erase(Const_Iterator it) {
-		//cout << "BEGINE"<<begin().operator->();
-		auto diff = it.operator->() - begin().operator->();
+		//auto diff = it.operator->() - begin().operator->();
+		auto diff = it - begin();
 		if (diff<0 || static_cast<size_type>(diff) >= sz)
 			throw runtime_error("Iterator out of bounds");
 		size_type current{ static_cast<size_type>(diff) };
@@ -202,7 +208,7 @@ class Const_Iterator { //automatisch friend von Vector
 	}
 
 	Iterator insert(Const_Iterator pos, const_reference val) {
-		auto diff = pos.operator->() - begin().operator->();;
+		auto diff = pos - begin();
 		if (diff<0 || static_cast<size_type>(diff)>sz)
 			throw runtime_error("Iterator out of bounds");
 		size_type current{ static_cast<size_type>(diff) };
@@ -288,7 +294,7 @@ class Const_Iterator { //automatisch friend von Vector
 
 
 };
-ostream& operator<<(ostream& os, const Vector& table) {
-	table.print(os);
+ostream& operator<<(ostream& os, const Vector& vector) {
+	vector.print(os);
 	return os;
 }
