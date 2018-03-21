@@ -1,23 +1,31 @@
 ﻿#pragma once
-#include<iostream>
+
 #include<initializer_list>
 #include <cstddef>
 #include <algorithm>
 using namespace std;
 
+template<typename T>
+class Vector;
+
+template <typename T>
+std::ostream& operator<<(std::ostream&, const Vector<T>&);
+
+
+template <typename T>
 class Vector
 {
 
 public:
 	class Iterator;
 	class Const_Iterator;
-	using value_type = double;
+	using value_type = T;
 	using size_type = size_t;
 	using difference_type = ptrdiff_t;
-	using reference = double&;
-	using const_reference = const double&;
-	using pointer = double*;
-	using const_pointer = const double*;
+	using reference = T&;
+	using const_reference = const T&;
+	using pointer = T*;
+	using const_pointer = const T*;
 	using iterator = Iterator;
 	using const_iterator = Const_Iterator;
 private:
@@ -37,7 +45,6 @@ public:
 			using iterator_category= std::forward_iterator_tag;
 	private:
 				pointer ptr;
-				size_type first{ 1 };
 				Vector *v;
 	public:
 				Iterator(pointer init_loc,Vector *v ) {
@@ -54,10 +61,9 @@ public:
 				}
 
 				Iterator operator++(int) {
-					if ((v->values + v->size()) == ptr+1) throw runtime_error("end() erreicht");
+					if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 					iterator old(*this);
 					 ++*this;
-
 					return old;
 				}
 
@@ -88,9 +94,13 @@ public:
 				operator Const_Iterator() {	
 					return Const_Iterator(ptr, v);
 				}
+				friend bool operator==(const Iterator& lop, const Iterator& rop){
+					return static_cast<Const_Iterator>(lop)==rop;
+				}
 				
-				
-
+				friend bool operator!=(const Iterator& lop, const Iterator& rop){
+					return static_cast<Const_Iterator>(lop)!=rop;
+				}
 	};
 
 class Const_Iterator { //automatisch friend von Vector
@@ -121,7 +131,7 @@ class Const_Iterator { //automatisch friend von Vector
 						++ptr;		
 					return *this;
 				}
-				bool operator!=(const Const_Iterator& it2) const {
+			/*	bool operator!=(const Const_Iterator& it2) const {
 					if ((it2.ptr) == (this->ptr))
 						return false;
 					return true;
@@ -130,7 +140,7 @@ class Const_Iterator { //automatisch friend von Vector
 					if ((it2.ptr) == (this->ptr))
 						return true;
 					return false;
-				}
+				}*/
 				const_reference operator*() const {
 					if ((v->values + v->size()) == ptr ) throw runtime_error("end() erreicht");
 					return *ptr;
@@ -150,16 +160,16 @@ class Const_Iterator { //automatisch friend von Vector
 				}
 
 				
-				friend difference_type operator-(const Const_Iterator& lop,
-					const Const_Iterator& rop) {
+				friend difference_type operator-(const Const_Iterator& lop,	const Const_Iterator& rop) {
 					return lop.ptr - rop.ptr;
 					
 				}
-				friend bool operator==(const Const_Iterator& lop,
-					const Const_Iterator& rop) {
-					if (lop.ptr == rop.ptr)return true;
-					return false;
+				friend bool operator==(const Const_Iterator& lop, const Const_Iterator& rop) {
+					return(lop.ptr == rop.ptr);
+				}
 
+				friend bool operator!=(const Const_Iterator& lop, const Const_Iterator& rop) {
+					return(lop.ptr != rop.ptr);
 				}
 
 				
@@ -262,14 +272,17 @@ class Const_Iterator { //automatisch friend von Vector
 	void clear() {
 		this->sz = 0;
 	}
-
+	
 	ostream& print(ostream & os) const {
+		/*Vector ausgabe*/
 		bool start = true;
+os<<"[";
 		for (size_type i = 0; i < this->sz; i++) {
 			if (!start) os << ",";
 			start = false;
 			os << this->values[i];
 		};
+os<<"]";
 		return os;
 	}
 
@@ -294,7 +307,10 @@ class Const_Iterator { //automatisch friend von Vector
 
 
 };
-ostream& operator<<(ostream& os, const Vector& vector) {
+
+
+template <typename T> 
+ostream& operator<<(ostream& os, const Vector<T>& vector) {
 	vector.print(os);
 	return os;
 }
