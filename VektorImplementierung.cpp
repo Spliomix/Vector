@@ -39,6 +39,7 @@ using namespace std;
 	class Angestellte : public Person {
 		int personal_nummer;
 	public:
+	size_t count{0};
 		Angestellte() : Person() {} //notwendig, um leere Arrayeintraege zu initialisieren
 		Angestellte(string vorname, string zuname, int alter, int personal_nummer) : Person{ vorname, zuname, alter }, personal_nummer{ personal_nummer } {}
 		ostream& print(ostream& o) const override {
@@ -58,6 +59,20 @@ using namespace std;
 		return o;
 	}
 
+///////////////////////////Spezialisierung/////////////////////////
+template<>
+size_t Vector<Angestellte>::Const_Iterator::count(){
+	return count_pp;
+}
+template<>
+Vector<Angestellte>::Const_Iterator& Vector<Angestellte>::Const_Iterator::operator++(){
+	if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
+	if(!(ptr->getAlter()%2))
+		++count_pp;
+	++ptr;
+	return *this;
+}
+//S////////////////////////////////////////////////////////////	
 
 	int main() {
 		Vector<int> vi{ 1,2,3,4,5 };
@@ -85,22 +100,52 @@ using namespace std;
 
 
 
-Angestellte a1{"Otto","Mueller",39,5};
-Angestellte a2{"Hans","Bauer",31,1};
-Vector<Person*>vvp{&a1, &a2};
-Vector<Person>vpp{a1, a2};
-cout<<"Person*:" ;
-for (const auto& i:vvp)
-	cout<<*i<<" ";
-cout<<endl<<"Person: ";
-for(const auto& i:vpp)
-	cout<< i <<" ";
-cout<<endl;
+		Angestellte a1{"Otto","Mueller",39,5};
+		Angestellte a2{"Hans","Bauer",31,1};
+		Vector<Person*>vvp{&a1, &a2};
+		Vector<Person>vpp{a1, a2};
+		cout<<"Person*:" ;
+		for (const auto& i:vvp)
+			cout<<*i<<" ";
+		cout<<endl<<"Person: ";
+		for(const auto& i:vpp)
+			cout<< i <<" ";
+		cout<<endl;
 		// Was fehlt in der Klasse Person, damit das folgende Statement kompiliert?
 		// Warum fehlt das nicht auch in der Klasse Angestellte?
 		cout<<*max_element(va.begin(), va.end());
 
 		// Geben Sie nun analog die juengste Angestellte aus (ohne weitere Aenderungen in Person bzw. Angestellte)
+		
+		//copy_if
+		cout<<"copy_if"<<endl;
+		Vector<int> v_copy_if{ 1,2,3,4,5 };
+		Vector<int>target{0};
+		copy_if(v_copy_if.begin(),v_copy_if.end(), back_inserter(target), 
+		[] (int& i)->bool{return i%2;});
+		for(const auto& i:target)
+			cout<<i<<" ";
+		cout<<endl;
+		Vector<int>::Const_Iterator it{target.begin()};
+
+
+		//count Funktion
+		cout<<"count"<<endl;
+		try{
+			cout<<"count"<<(++it).count()<<endl;
+		}catch (const std::runtime_error& e) {
+       	 std::cout << e.what() << '\n';
+    	}
+		
+
+		//Spezialisierung
+		Vector<Angestellte>::Const_Iterator it2{va.begin()};
+		cout<<"count mit Angestellte"<<endl;
+		try{	
+			cout<<"count: "<<(++it2).count()<<endl;
+		}catch (const std::runtime_error& e) {
+        	std::cout << e.what() << '\n';
+    	}
 	return 0;
 }
 
