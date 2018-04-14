@@ -46,6 +46,7 @@ public:
 	private:
 				pointer ptr;
 				Vector *v;
+				size_t count_pp{0};
 	public:
 				Iterator(pointer init_loc,Vector *v ) {
 					ptr=init_loc;
@@ -57,9 +58,12 @@ public:
 				Iterator& operator++() {
 					if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 						++ptr;
+						++count_pp;
 					return *this;
 				}
-
+				size_t count(){
+					return count_pp;
+				}
 				Iterator operator++(int) {
 					if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
 					iterator old(*this);
@@ -115,6 +119,7 @@ class Const_Iterator { //automatisch friend von Vector
 	private:
 				pointer ptr;
 				const Vector *v;
+				size_t count_pp{0};
 	public:
 		Const_Iterator(pointer init_loc, const Vector *v) {
 					ptr=init_loc;
@@ -128,19 +133,14 @@ class Const_Iterator { //automatisch friend von Vector
 		}
 		Const_Iterator& operator++() {
 			if ((v->values + v->size()) == ptr) throw runtime_error("end() erreicht");
-						++ptr;		
+						++ptr;	
+						++count_pp;	
 					return *this;
 				}
-			/*	bool operator!=(const Const_Iterator& it2) const {
-					if ((it2.ptr) == (this->ptr))
-						return false;
-					return true;
+			size_t count(){
+				throw runtime_error(" throw count für const Iterator");
+				return 0;
 				}
-				bool operator==(const Const_Iterator& it2) const {
-					if ((it2.ptr) == (this->ptr))
-						return true;
-					return false;
-				}*/
 				const_reference operator*() const {
 					if ((v->values + v->size()) == ptr ) throw runtime_error("end() erreicht");
 					return *ptr;
@@ -299,9 +299,6 @@ os<<"]";
 		};
 		delete[] values;
 		values = temp;
-
-
-		
 	}
 
 
